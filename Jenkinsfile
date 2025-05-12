@@ -6,7 +6,7 @@ pipeline {
     stage('Clone Repo') {
       steps {
         echo 'Cloning repo...'
-        git 'https://github.com/harjit23/hello-world-test.git'
+        git 'https://github.com/harjit23/cicd-test-react.git'
       }
     }
 
