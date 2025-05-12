@@ -1,37 +1,50 @@
-// Jenkinsfile content
 pipeline {
-  agent any
+    agent any
 
-  stages {
-    stage('Clone Repo') {
-      steps {
-        echo 'Cloning repo...'
-        git branch: 'main', url: 'https://github.com/harjit23/cicd-test-react.git'
-      }
+    tools {
+        nodejs "node16"  // Must match the name given in Global Tool Config
     }
 
-    stage('Install Dependencies') {
-      steps {
-        sh 'npm install'
-      }
+    environment {
+        IMAGE_NAME = "192.168.29.254:5000/react-app"
     }
 
-    stage('Build React App') {
-      steps {
-        sh 'npm run build'
-      }
-    }
+    stages {
+        stage('Clone Repo') {
+            steps {
+                echo "Cloning repository..."
+                git 'https://github.com/harjit23/cicd-test-react.git'
+            }
+        }
 
-    stage('Docker Build') {
-      steps {
-        sh 'docker build -t react-hello-world .'
-      }
-    }
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
 
-    stage('Docker Run') {
-      steps {
-        sh 'docker run -d -p 3000:80 react-hello-world'
-      }
+        stage('Build React App') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                sh """
+                    docker build -t $IMAGE_NAME:latest .
+                    docker push $IMAGE_NAME:latest
+                """
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                sh """
+                    docker rm -f react-app || true
+                    docker run -d -p 3000:80 --name react-app $IMAGE_NAME:latest
+                """
+            }
+        }
     }
-  }
 }
