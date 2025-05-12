@@ -41,7 +41,12 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 sh """
-                    docker rm -f react-app || true
+                    # Remove old container if it exists
+                    if [ \$(docker ps -aq -f name=react-app) ]; then
+                        docker rm -f react-app || true
+                    fi
+
+                    # Run new container on port 3000 -> 80
                     docker run -d -p 3000:80 --name react-app $IMAGE_NAME:latest
                 """
             }
