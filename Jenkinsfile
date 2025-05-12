@@ -13,7 +13,7 @@ pipeline {
         stage('Clone Repo') {
             steps {
                 echo "Cloning repository..."
-                git 'https://github.com/harjit23/cicd-test-react.git'
+                git branch: 'main', url: 'https://github.com/harjit23/cicd-test-react.git'
             }
         }
 
